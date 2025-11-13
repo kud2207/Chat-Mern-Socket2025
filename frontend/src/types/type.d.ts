@@ -1,17 +1,21 @@
+import type { Socket } from "socket.io-client";
 
 // Définition de l'interface pour le store
-export interface AuthState {
+export interface UseAuthState {
   authUser: AuthUser | null;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
-  onlineUsers:[];
+  onlineUsers: string[];
+  socket: Socket | null;
   checkAuth: () => Promise<void>;
   login: (data: LoginData) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
   updateProfile: (data: photoProfileData) => Promise<void>;
   logout: () => Promise<void>;
+  connectSocket: () => Promise<void>;
+  disConnectSocket: () => Promise<void>;
 
 }
 
@@ -44,7 +48,7 @@ export interface photoProfileData {
 }
 
 //pour les theme
-type ThemeStore = {
+type UseThemeStore = {
   theme: string;
   setTheme: (theme: string) => void;
 };
@@ -73,7 +77,7 @@ export interface IMessage {
 }
 
 
-export interface ChatState {
+export interface UseChatState {
   messages: IMessage[];
   users: IUser[];
   selectedUser: IUser | null;

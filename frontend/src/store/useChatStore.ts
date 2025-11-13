@@ -1,14 +1,15 @@
 import toast from "react-hot-toast";
-import type { ChatState, IUser } from "../types/type";
+import type { UseChatState, IUser } from "../types/type";
 import { axiosInstance } from "../lib/axios";
 import { create } from "zustand";
 
-export const useChatStore = create<ChatState>((set, get) => ({
+export const useChatStore = create<UseChatState>((set, get) => ({
     messages: [],
     users: [],
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
+   
 
     //affiche Les User
     getUsers: async () => {
