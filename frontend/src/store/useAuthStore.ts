@@ -35,7 +35,7 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data });
+      set({ authUser: res.data.data });
       toast.success(res.data.message);
 
       get().connectSocket(); //recuper l'etat de connection
@@ -51,7 +51,7 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
+      set({ authUser: res.data.data });
       toast.success(res.data.message);
 
       get().connectSocket(); //recuper l'etat de connection
@@ -69,7 +69,7 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
     set({ isUpdatingProfile: true });
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
-      set({ authUser: res.data });
+      set({ authUser: res.data.data });
       toast.success(res.data.message);
     } catch (error) {
       console.error("error de update", error);
