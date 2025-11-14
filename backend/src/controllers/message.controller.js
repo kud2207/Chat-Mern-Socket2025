@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
@@ -34,7 +35,7 @@ export const getMessages = async (req, res) => {
                 { senderId: myId, receiverId: userTochatId },
                 { senderId: userTochatId, receiverId: myId },
             ],
-        });
+        }).sort({ createdAt: 1 });
 
         //récupérer les infos de l'autre utilisateur
         const otherUser = await User.findById(userTochatId).select("username email profilePic");
@@ -53,7 +54,7 @@ export const getMessages = async (req, res) => {
 }
 
 /**
- post msg
+ send msg
  */
 export const sendMessages = async (req, res) => {
     try {
@@ -75,6 +76,13 @@ export const sendMessages = async (req, res) => {
         })
 
         await newMessage.save();
+
+        //fontion socket pour encvoyer le message
+        const receiverSocketId = getReceiverSocketId(receiverId)
+        if(receiverSocketId){//envoie evenement uniquement au socket
+            io.to(receiverSocketId).emit("newMessage", newMessage.toObject())
+        }
+
         res.status(200).json({
             message: "Message envoyé avec succès",
             data: newMessage,

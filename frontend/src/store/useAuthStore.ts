@@ -104,9 +104,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
         query: {
           userId: authUser._id
         }
-      }
-
-      );
+      });
+      
       socket.connect();
       set({ socket: socket });
 

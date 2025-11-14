@@ -87,4 +87,6 @@ export interface UseChatState {
   getMessages: (id: string) => Promise<void>;
   setSelectedUser: (id: IUser | null) => Promise<void>;
   sendMessage: (data) => Promise<void>;
+  subscribeToMessages: () => Promise<void>;
+  unSubscribeToMessages: () => Promise<void>;
 }

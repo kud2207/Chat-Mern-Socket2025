@@ -14,13 +14,17 @@ const io = new Server(server, {
     }
 });
 
+//pour receved msg (donne l’adresse en temps réel user)
+export function getReceiverSocketId(userId) {
+    return userSocketMap[userId]
+}
+
 
 const userSocketMap = {} //used to store online users
 
 
 // pour ecouter qui se connecte au server // 
 io.on("connection", (socket) => {
-    console.log("User connected", socket.id);
 
     const userId = socket.handshake.query.userId;
     if (userId) userSocketMap[userId] = socket.id;
@@ -30,7 +34,7 @@ io.on("connection", (socket) => {
 
 
     socket.on("disconnect", () => {
-        console.log('User disconnect', socket.id)
+
 
         //suprime le user qui n'est pas connecté
         delete userSocketMap[userId];
