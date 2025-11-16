@@ -3,8 +3,10 @@ import { axiosInstance } from "../lib/axios";
 import type { UseAuthState, LoginData, photoProfileData, SignupData, } from "../types/type";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import type { AxiosError } from "axios";
 
-const BASE_URL: string = "http://localhost:5000"
+const BASE_URL: string = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
+
 
 export const useAuthStore = create<UseAuthState>((set, get) => ({
   authUser: null,
@@ -40,7 +42,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
 
       get().connectSocket(); //recuper l'etat de connection
     } catch (error) {
-      toast.error(error.response.data.message);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Erreur inattendue dans login");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -57,7 +60,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
       get().connectSocket(); //recuper l'etat de connection
     } catch (error) {
       console.error("error de signup", error);
-      toast.error(error.response.data.message);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Erreur inattendue dans signup");
     } finally {
       set({ isSigningUp: false });
     }
@@ -73,7 +77,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
       toast.success(res.data.message);
     } catch (error) {
       console.error("error de update", error);
-      toast.error(error.response.data.message);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Erreur inattendue dans updateProfile");
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -89,7 +94,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
       get().disConnectSocket()
     } catch (error) {
       console.error("error de logout", error);
-      toast.error(error.response?.data?.message);
+      const err = error as AxiosError<{ message: string }>;
+      toast.error(err.response?.data?.message || "Erreur inattendue dans logout");
     }
   },
 
@@ -105,7 +111,7 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
           userId: authUser._id
         }
       });
-      
+
       socket.connect();
       set({ socket: socket });
 
@@ -113,12 +119,13 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
        * envoie les userconect au back et on 
        * utilise le mm "" comme pour le back io.emmi
        */
-      socket.on("getOnlineUsers", (userIds)=>{ 
-        set({onlineUsers:userIds})
+      socket.on("getOnlineUsers", (userIds) => {
+        set({ onlineUsers: userIds })
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("error de conectSocke", error);
-      toast.error(error.response?.data?.message);
+      const message = (error as { message?: string })?.message || "Erreur de connexion socket";
+      toast.error(message);
     }
 
   },
@@ -129,7 +136,8 @@ export const useAuthStore = create<UseAuthState>((set, get) => ({
       if (get().socket?.connected) get().socket?.disconnect();
     } catch (error) {
       console.error("error de disconectSocke", error);
-      toast.error(error.response?.data?.message);
+      const message = (error as { message?: string })?.message || "error de disconectSocke";
+      toast.error(message);
     }
 
   },

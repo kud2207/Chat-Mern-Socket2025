@@ -3,6 +3,7 @@ import type { UseChatState, IUser } from "../types/type";
 import { axiosInstance } from "../lib/axios";
 import { create } from "zustand";
 import { useAuthStore } from "./useAuthStore";
+import type { AxiosError } from "axios";
 
 export const useChatStore = create<UseChatState>((set, get) => ({
     messages: [],
@@ -10,7 +11,7 @@ export const useChatStore = create<UseChatState>((set, get) => ({
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
-   
+
 
     //affiche Les User
     getUsers: async () => {
@@ -19,7 +20,8 @@ export const useChatStore = create<UseChatState>((set, get) => ({
             const res = await axiosInstance.get("/message/users");
             set({ users: res.data });
         } catch (error) {
-            toast.error(error.response?.data?.message || "Erreur lors du chargement des utilisateurs");
+            const err = error as AxiosError<{ message: string }>;
+            toast.error(err.response?.data?.message || "Erreur inattendue lors du chargement des utilisateurs");
         } finally {
             set({ isUsersLoading: false });
         }
@@ -34,7 +36,8 @@ export const useChatStore = create<UseChatState>((set, get) => ({
             const msgs = Array.isArray(res.data.data) ? res.data.data : [];
             set({ messages: msgs });
         } catch (error) {
-            toast.error(error.response?.data?.message || "Erreur lors du chargement des messages");
+            const err = error as AxiosError<{ message: string }>;
+            toast.error(err.response?.data?.message || "Erreur inattendue lors du chargement des messages");
             set({ messages: [] }); // sécurité
         } finally {
             set({ isMessagesLoading: false });
@@ -61,26 +64,27 @@ export const useChatStore = create<UseChatState>((set, get) => ({
             set({ messages: [...messages, res.data.data] });
             return res.data.data;
         } catch (error) {
-            console.log("eeror envoi", error)
-            toast.error(error.response.data.message)
+            console.log("eror envoi", error)
+            const err = error as AxiosError<{ message: string }>;
+            toast.error(err.response?.data?.message || "Erreur inattendue lors de l'envoi du message");
             throw error; //relance l’erreur pour que le composant la capte
         }
     },
 
     //Fontion pour recevoir les msg socket
-    subscribeToMessages:async() =>{
-        const {selectedUser} = get();
-        if(!selectedUser) return;
+    subscribeToMessages: async () => {
+        const { selectedUser } = get();
+        if (!selectedUser) return;
 
         const socket = useAuthStore.getState().socket;
-        socket?.on("newMessage", (newMessage)=>{ //ecoute un ev newMessage du server et le recup
+        socket?.on("newMessage", (newMessage) => { //ecoute un ev newMessage du server et le recup
             set({
                 messages: [...get().messages, newMessage] //ajour les msg du store et ajoute
             })
         })
     },
 
-    unSubscribeToMessages:async()=>{
+    unSubscribeToMessages: async () => {
         const socket = useAuthStore.getState().socket;
         socket?.off("newMessage")
     }

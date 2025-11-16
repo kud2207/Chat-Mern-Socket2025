@@ -1,6 +1,4 @@
-import React from 'react';
-import { MessageSquare } from 'lucide-react'; // 👈 Icône SVG (bibliothèque d'icônes)
-
+import { MessageSquare } from 'lucide-react'; 
 const NoChatSelected = () => {
   return (
     <div className="w-full flex-col items-center justify-center p-16 bg-base-100/50">

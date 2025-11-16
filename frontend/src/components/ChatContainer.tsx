@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import{ useEffect, useRef } from 'react';
 
 import { useChatStore } from '../store/useChatStore';
 import ChatHeader from './ChatHeader';
@@ -10,8 +10,7 @@ import { formatMessageTime } from '../lib/utils';
 const ChatContainer = () => {
   const { messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unSubscribeToMessages } = useChatStore();
   const { authUser } = useAuthStore()
-
-  const messageEndRef = React.useRef(null);//scroll en bas
+const messageEndRef = useRef<HTMLDivElement>(null);//scroll en bas
 
 
   useEffect(() => {
